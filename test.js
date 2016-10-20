@@ -1,22 +1,16 @@
-// var model = require("./model.js");
-// var Record = model.Record;
-// var connection1 = model.connection1;
+var connection = require("./connection.js");
+connection.connect();
 
 
-var migration = require("./migration.js");
-var createTable = migration.createTable;
-var deleteTable = migration.deleteTable;
-var connection2 = migration.connection;
-
-// deleteTable('pet', function(result){console.log('The result is: \n', result);});
-
-// createTable('Customer', {'id': 'int', 'name' : 'VARCHAR(100)', 'age' : 'int', 'gender' : 'VARCHAR(100)'}, function(result){console.log('The result is: \n', result);});
-
-// var customer = new Record('customers', {});
-// customer.findAll(function(result){console.log('The result is: \n', result);});
+var createTable = require("./migration.js").createTable;
+var deleteTable = require("./migration.js").deleteTable;
+deleteTable('customers', function(result){console.log('The result is: \n', result);}, connection);
+createTable('customers', {'id': 'int', 'name' : 'VARCHAR(100)', 'age' : 'int', 'gender' : 'VARCHAR(100)'}, function(result){console.log('The result is: \n', result);}, connection);
 
 
+var Record = require("./model.js").Record;
+var customer = new Record('customers', {'belongs_to' : null, 'has_many' : null});
+customer.findAll(function(result){console.log('The result is: \n', result);}, connection);
 
-//TODO: use pool connection and end all connections.
-// connection1.end();
-connection2.end();
+
+connection.end();

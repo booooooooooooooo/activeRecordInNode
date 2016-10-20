@@ -1,12 +1,8 @@
-var connection = require("./connection.js");
-connection.connect();
-
-
 /**
  * Create new table in database.
  * property = {propertyName : type, propertyName : type,...}
  */
-var createTable = function(tableName, property, cb){
+var createTable = function(tableName, property, cb, connection){
   var sentence = 'CREATE TABLE' + ' ' + tableName + ' ';
   sentence = sentence + '(' + ' ';
   for(key in property){
@@ -17,18 +13,19 @@ var createTable = function(tableName, property, cb){
     if(err) throw err;
     cb(result);
   });
+
 }
 
 /**
  * Delete table from database.
  */
-var deleteTable = function(tableName, cb){
+var deleteTable = function(tableName, cb, connection){
   connection.query('DROP TABLE ' + tableName, function(err, result){
     if(err) throw err;
     cb(result);
   });
+
 }
 
 module.exports.createTable = createTable;
 module.exports.deleteTable = deleteTable;
-module.exports.connection = connection;
