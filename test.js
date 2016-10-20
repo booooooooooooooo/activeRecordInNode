@@ -10,6 +10,10 @@ createTable('customers', {'id': 'int', 'name' : 'VARCHAR(100)', 'age' : 'int', '
 
 var Record = require("./model.js").Record;
 var customer = new Record('customers', {'belongs_to' : null, 'has_many' : null});
+customer.insert([{'name' : 'bo', 'age' : 88, 'gender' : 'f'}], function(result){console.log('The result is: \n', result);}, connection);
+customer.findAll(function(result){console.log('The result is: \n', result);}, connection);
+customer.find({'name' : 'bo', 'age' : 88, 'gender' : 'f'}, function(result){console.log('The result is: \n', result);}, connection);
+customer.delete([{'name' : 'bo', 'age' : 88, 'gender' : 'f'}], function(result){console.log('The result is: \n', result);}, connection);
 customer.findAll(function(result){console.log('The result is: \n', result);}, connection);
 
 

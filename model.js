@@ -18,49 +18,69 @@ Record.prototype.findAll = function(cb, connection) {
 };
 
 /**
- * condition = {}
+ * @condition = {propertyName : value, propertyName : value,...}
  */
 Record.prototype.find = function(condition, cb, connection) {
-  var connection = require("./connection.js");
-  connection.connect();
+  var sentence = 'SELECT * from '  + this.tableName  + ' where ';
+  var count = 0;
+  for(var key in condition){
+      if(count === 0){
+         sentence = sentence + ' ' + key +  ' ' + '=' + ' ' + '\'' + condition[key]  + '\'' +' ';
+
+        count = 1;
+      }
+      else{
+        sentence = sentence + ' and ' +' ' + key + ' ' + '=' + ' ' + '\'' + condition[key] + '\'' +' ';
+      }
+  }
   //TODO: join table
-  connection.query('SELECT * from ' + this.tableName + ' where name = ' + '\'' + name + '\'', function(err, rows, fields) {
+  connection.query(sentence, function(err, rows, fields) {
     if (err) throw err;
     cb(rows);
   });
-  connection.end();
 };
 
-// /**
-//  *  data = [{}, {}, {},...]
-//  */
-// Record.prototype.insert = function(data, cb, connection){
-//   //TODO: insert all data, at the same time, add primary id.
-// var connection = require("./connection.js");
-// connection.connect();
-//   connection.query('INSERT INTO ' + this.tableName + ' SET ?', dog, function(err,res){
-//     if(err) throw err;
-//     cb(res);
-//   });
-//   connection.end();
-// };
-//
-//
-// /**
-//  *  data = [{}, {}, {},...].
-//  */
-// Record.prototype.delete = function(data, cb, connection){
-// var connection = require("./connection.js");
-// connection.connect();
-//   //TODO: delete all records that satisfy requirement.
-//   connection.query( 'DELETE FROM ' + this.tableName + ' WHERE name = ?', name,
-//   function (err, result) {
-//     if (err) throw err;
-//     cb(result);
-//   } );
-//   connection.end();
-// };
-//
+/**
+ * Insert a new record to database.
+ * @data = [{}, {}, {},...]. Each {} contains all property except id.
+ */
+Record.prototype.insert = function(data, cb, connection){
+  var len = data.length;
+  for (var i = 0; i < len; i++) {
+      //TODO: replace id with serial number.
+      var id = 0;
+      data[i]['id'] = 0;
+      connection.query('INSERT INTO ' + this.tableName + ' SET ?', data[i], function(err,res){
+        if(err) throw err;
+        cb(res);
+      });
+  }
+};
+
+
+/**
+ *  data = [{}, {}, {},...].
+ */
+Record.prototype.delete = function(data, cb, connection){
+  var len = data.length;
+  for (var i = 0; i < len; i++) {
+    sentence = ' DELETE  FROM ' + this.tableName + ' WHERE ' ;
+    var count = 0;
+    for(var key in data[i]){
+        if(count === 0){
+          sentence = sentence + ' ' + key + ' ' + '=' + ' ' + '\''+  data[i][key] + '\'' + ' ';
+          count = 1;
+        }
+        else sentence = sentence + ' ' + 'and' + ' ' + key + ' ' + '=' + ' '+ '\'' +  data[i][key] + '\''+ ' ';
+    }
+    // console.log(sentence);
+    connection.query( sentence, function (err, result) {
+      if (err) throw err;
+      cb(result);
+    });
+  }
+};
+
 // /**
 //  *  condition = {}, which contains the attributes to locate records.
 //  *  modify = {} which contains the data to be modified of located records.
