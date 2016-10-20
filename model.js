@@ -59,6 +59,7 @@ Record.prototype.insert = function(data, cb, connection){
 
 
 /**
+ * Delete records with given properties.
  *  data = [{}, {}, {},...].
  */
 Record.prototype.delete = function(data, cb, connection){
@@ -73,7 +74,6 @@ Record.prototype.delete = function(data, cb, connection){
         }
         else sentence = sentence + ' ' + 'and' + ' ' + key + ' ' + '=' + ' '+ '\'' +  data[i][key] + '\''+ ' ';
     }
-    // console.log(sentence);
     connection.query( sentence, function (err, result) {
       if (err) throw err;
       cb(result);
@@ -126,19 +126,16 @@ Record.prototype.delete = function(data, cb, connection){
 //   connection.end();
 // }
 //
-//
-// /**
-//  *  Get scheme information of table.
-//  */
-// Record.prototype.getScheme = function(cb, connection){
-// var connection = require("./connection.js");
-// connection.connect();
-//   connection.query( "DESCRIBE " + this.tableName, function(err, rows, fields){
-//     if (err) throw err;
-//     cb(rows);
-//   } );
-//   connection.end();
-// };
+
+/**
+ *  Get scheme information of table.
+ */
+Record.prototype.getScheme = function(cb, connection){
+  connection.query( "DESCRIBE " + this.tableName, function(err, rows, fields){
+    if (err) throw err;
+    cb(rows);
+  } );
+};
 
 
 module.exports.Record = Record;
