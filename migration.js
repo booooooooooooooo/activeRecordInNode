@@ -9,26 +9,24 @@ connection.connect();
 var createTable = function(tableName, property, cb){
   var sentence = 'CREATE TABLE' + ' ' + tableName + ' ';
   sentence = sentence + '(' + ' ';
-  //TODO: finish creating table.
-  connection.query('CREATE TABLE TerStops ( Stop_id int,
-                Stop_name VARCHAR(100),
-                Stop_lat VARCHAR(100),
-                Stop_lon VARCHAR(100),
-                PRIMARY KEY(Stop_id))', function(err, result){
-                    if(err) {
-                        console.log(err);
-                    }
-                    else{
-                        console.log("Table Ter_Stops Created");
-                    }
-                });
+  for(key in property){
+    sentence = sentence + ' ' + key + ' ' + property[key] + ' ' + ',' + ' ';
+  }
+  sentence = sentence + ' ' + 'PRIMARY KEY(' + ' ' + 'id' + ')' + ')';
+  connection.query(sentence, function(err, result){
+    if(err) throw err;
+    cb(result);
+  });
 }
 
 /**
  * Delete table from database.
  */
 var deleteTable = function(tableName, cb){
-  //TODO
+  connection.query('DROP TABLE ' + tableName, function(err, result){
+    if(err) throw err;
+    cb(result);
+  });
 }
 
 module.exports.createTable = createTable;
