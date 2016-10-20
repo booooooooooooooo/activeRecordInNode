@@ -1,47 +1,53 @@
-var mysql      = require('mysql');
-var connection = mysql.createConnection({
-  host     : 'localhost',
-  user     : 'root',
-  password : '11235813',
-  database : 'testDb'
-});
-
+var connection = require("./connection.js");
 connection.connect();
 
 
-
-function Record(tableName) {
+/**
+ *  Constructor
+ */
+function Record(tableName, association) {
   this.tableName = tableName;
+  this.belongs_to = association[belongs_to];
+  this.has_many = association[has_many];
 }
-Record.prototype.selectAll = function(cb) {
+
+/**
+ * Get the whole table. For test purpose.
+ */
+Record.prototype.findAll = function(cb) {
   connection.query('SELECT * from ' + this.tableName , function(err, rows, fields) {
     if (err)  throw err;
     cb(rows);
   });
 };
-
-Record.prototype.findBy = function(name, cb) {
+/**
+ * condition = {}
+ */
+Record.prototype.find = function(condition, cb) {
+  //TODO: join table
   connection.query('SELECT * from ' + this.tableName + ' where name = ' + '\'' + name + '\'', function(err, rows, fields) {
     if (err) throw err;
     cb(rows);
   });
 };
 
-Record.prototype.insert = function(dog, cb){
+/**
+ *  data = [{}, {}, {},...]
+ */
+Record.prototype.insert = function(data, cb){
+  //TODO: insert all data, at the same time, add primary id.
   connection.query('INSERT INTO ' + this.tableName + ' SET ?', dog, function(err,res){
     if(err) throw err;
     cb(res);
   });
 };
 
-Record.prototype.getScheme = function(cb){
-  connection.query( "DESCRIBE " + this.tableName, function(err, rows, fields){
-    if (err) throw err;
-    cb(rows);
-  } );
-};
 
-Record.prototype.delete = function(name, cb){
+/**
+ *  data = [{}, {}, {},...].
+ */
+Record.prototype.delete = function(data, cb){
+  //TODO: delete all records that satisfy requirement.
   connection.query( 'DELETE FROM ' + this.tableName + ' WHERE name = ?', name,
   function (err, result) {
     if (err) throw err;
@@ -49,7 +55,12 @@ Record.prototype.delete = function(name, cb){
   } );
 };
 
-Record.prototype.update = function(animal, cb){
+/**
+ *  condition = {}, which contains the attributes to locate records.
+ *  modify = {} which contains the data to be modified of located records.
+ */
+Record.prototype.update = function(condition, modify, cb){
+  //TODO: locate and modify records.
   var sentence = '';
   sentence = sentence + ' UPDATE ' + this.tableName + ' SET ' ;
   var count = 0;
@@ -85,6 +96,18 @@ Record.prototype.update = function(animal, cb){
     }
   );
 }
+
+
+/**
+ *  Get scheme information of table.
+ */
+Record.prototype.getScheme = function(cb){
+  connection.query( "DESCRIBE " + this.tableName, function(err, rows, fields){
+    if (err) throw err;
+    cb(rows);
+  } );
+};
+
 
 module.exports.Record = Record;
 module.exports.connection = connection;
