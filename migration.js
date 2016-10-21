@@ -27,6 +27,5 @@ var deleteTable = function(tableName, cb, connection){
 
 }
 
-module.exports.createTable = createTable;
+module.exports.createTable = createTable;  
 module.exports.deleteTable = deleteTable;
- 
