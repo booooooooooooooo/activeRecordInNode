@@ -18,6 +18,7 @@ Record.prototype.findAll = function(cb, connection) {
 };
 
 /**
+ * Find records that satisfy conditin.
  * @condition = {propertyName : value, propertyName : value,...}
  */
 Record.prototype.find = function(condition, cb, connection) {
@@ -59,8 +60,8 @@ Record.prototype.insert = function(data, cb, connection){
 
 
 /**
- * Delete records with given properties.
- *  data = [{}, {}, {},...].
+ *  Delete records with given properties.
+ *  @data = [{}, {}, {},...].
  */
 Record.prototype.delete = function(data, cb, connection){
   var len = data.length;
@@ -82,8 +83,9 @@ Record.prototype.delete = function(data, cb, connection){
 };
 
 /**
- *  condition = {}, which contains the attributes to locate records.
- *  modify = {} which contains the data to be modified of located records.
+ *  Update target record.
+ *  @id is for locating record.
+ *  @modify = {} which contains the data to be modified of located record.
  */
 Record.prototype.update = function(id, modify, cb, connection){
   //TODO: locate and modify records.
