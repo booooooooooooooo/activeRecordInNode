@@ -21,20 +21,20 @@ Record.prototype.findAll = function(cb, connection) {
  * @condition = {propertyName : value, propertyName : value,...}
  */
 Record.prototype.find = function(condition, cb, connection) {
-  var sentence = 'SELECT * from '  + this.tableName  + ' where ';
+  var querySentence = 'SELECT * from '  + this.tableName  + ' where ';
   var count = 0;
   for(var key in condition){
       if(count === 0){
-         sentence = sentence + ' ' + key +  ' ' + '=' + ' ' + '\'' + condition[key]  + '\'' +' ';
+         querySentence = querySentence + ' ' + key +  ' ' + '=' + ' ' + '\'' + condition[key]  + '\'' +' ';
 
         count = 1;
       }
       else{
-        sentence = sentence + ' and ' +' ' + key + ' ' + '=' + ' ' + '\'' + condition[key] + '\'' +' ';
+        querySentence = querySentence + ' and ' +' ' + key + ' ' + '=' + ' ' + '\'' + condition[key] + '\'' +' ';
       }
   }
   //TODO: join table
-  connection.query(sentence, function(err, rows, fields) {
+  connection.query(querySentence, function(err, rows, fields) {
     if (err) throw err;
     cb(rows);
   });
@@ -65,67 +65,56 @@ Record.prototype.insert = function(data, cb, connection){
 Record.prototype.delete = function(data, cb, connection){
   var len = data.length;
   for (var i = 0; i < len; i++) {
-    sentence = ' DELETE  FROM ' + this.tableName + ' WHERE ' ;
+    querySentence = ' DELETE  FROM ' + this.tableName + ' WHERE ' ;
     var count = 0;
     for(var key in data[i]){
         if(count === 0){
-          sentence = sentence + ' ' + key + ' ' + '=' + ' ' + '\''+  data[i][key] + '\'' + ' ';
+          querySentence = querySentence + ' ' + key + ' ' + '=' + ' ' + '\''+  data[i][key] + '\'' + ' ';
           count = 1;
         }
-        else sentence = sentence + ' ' + 'and' + ' ' + key + ' ' + '=' + ' '+ '\'' +  data[i][key] + '\''+ ' ';
+        else querySentence = querySentence + ' ' + 'and' + ' ' + key + ' ' + '=' + ' '+ '\'' +  data[i][key] + '\''+ ' ';
     }
-    connection.query( sentence, function (err, result) {
+    connection.query( querySentence, function (err, result) {
       if (err) throw err;
       cb(result);
     });
   }
 };
 
-// /**
-//  *  condition = {}, which contains the attributes to locate records.
-//  *  modify = {} which contains the data to be modified of located records.
-//  */
-// Record.prototype.update = function(condition, modify, cb, connection){
-// var connection = require("./connection.js");
-// connection.connect();
-//   //TODO: locate and modify records.
-//   var sentence = '';
-//   sentence = sentence + ' UPDATE ' + this.tableName + ' SET ' ;
-//   var count = 0;
-//   for(var key in animal){
-//     // console.log(key);
-//     if(key === 'name') ;
-//     else if(count === 0){
-//       sentence = sentence + ' ' + key + ' ' + '=' + ' ' +  '?';
-//       count = 1;
-//     }
-//     else sentence = sentence + ',' + ' ' + key + ' ' + '=' + ' ?';
-//   }
-//   sentence = sentence + ' ' + 'where' + ' ' + 'name' + ' ' + '=' + '? ';
-//   // console.log("sentence is \n");
-//   // console.log(sentence);
-//
-//   var data = [];
-//   for(var key in animal){
-//     // console.log(animal[key]);
-//     if( key === 'name') ;
-//     else data.push(animal[key]);
-//   }
-//   data.push(animal['name']);
-//   // console.log("data is \n");
-//   // console.log(data);
-//
-//   connection.query(
-//     sentence,
-//     data,
-//     function (err, result) {
-//       if (err) throw err;
-//       cb(result);
-//     }
-//   );
-//   connection.end();
-// }
-//
+/**
+ *  condition = {}, which contains the attributes to locate records.
+ *  modify = {} which contains the data to be modified of located records.
+ */
+Record.prototype.update = function(id, modify, cb, connection){
+  //TODO: locate and modify records.
+  var querySentence = '';
+  querySentence = querySentence + ' UPDATE ' + this.tableName + ' SET ' ;
+  var count = 0;
+  for(var key in modify){
+    if(count === 0){
+      querySentence = querySentence + ' ' + key + ' ' + '=' + ' ' +  '?';
+      count = 1;
+    }
+    else querySentence = querySentence + ',' + ' ' + key + ' ' + '=' + ' ?';
+  }
+  querySentence = querySentence + ' ' + 'where' + ' ' + 'id' + ' ' + '=' + '? ';
+  console.log("querySentence is \n");
+  console.log(querySentence);
+
+  var data = [];
+  for(var key in modify){
+    data.push(modify[key]);
+  }
+  data.push(id);
+  console.log("data is \n");
+  console.log(data);
+
+  connection.query( querySentence, data, function (err, result) {
+    if (err) throw err;
+    cb(result);
+  });
+}
+
 
 /**
  *  Get scheme information of table.
