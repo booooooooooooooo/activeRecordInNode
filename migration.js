@@ -2,7 +2,7 @@
  * Create new table in database.
  * property = {propertyName : type, propertyName : type,...}
  */
-
+ 
 //TODO: Add function to change scheme, such as constrains.
 
 var createTable = function(tableName, property, cb, connection){

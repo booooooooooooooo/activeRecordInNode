@@ -5,7 +5,7 @@ var closureModel = function(){
   function Model(tableName) {
     this.tableName = tableName;
   }
-
+ 
   /**
    * Get the whole table. For test purpose.
    */
@@ -117,16 +117,16 @@ var closureModel = function(){
       cb(result);
     });
   }
-  //
-  // /**
-  //  *  Get scheme information of table.
-  //  */
-  // Model.prototype.getScheme = function(cb, connection){
-  //   connection.query( "DESCRIBE " + this.tableName, function(err, rows, fields){
-  //     if (err) throw err;
-  //     cb(rows);
-  //   } );
-  // };
+
+  /**
+   *  Get scheme information of table.
+   */
+  Model.prototype.getScheme = function(cb, connection){
+    connection.query( "DESCRIBE " + this.tableName, function(err, rows, fields){
+      if (err) throw err;
+      cb(rows);
+    } );
+  };
 
   return Model;
 }();

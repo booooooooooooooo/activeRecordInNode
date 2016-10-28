@@ -1,5 +1,3 @@
-//TODO: Proxy only supports fundermental operation
-
 var Model = require("./model.js");
 
 

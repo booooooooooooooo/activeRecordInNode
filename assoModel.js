@@ -4,6 +4,7 @@ var Model = require("./model.js");
 
 //TODO: the scheme used here should be consistent or smaller than the constrains in relational database.
 //TODO: Cannot change database schema here. TO change it, call function in migration.js module.
+
 var AssoModel = function(tableName, belongToJson, hasManyJson){
   this.tableName = tableName;
   this.belongs_to = belongToJsonArr;
