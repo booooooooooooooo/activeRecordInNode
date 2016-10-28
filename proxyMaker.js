@@ -1,25 +1,26 @@
-//TODO: why proxy cannot trap findAll?????????
+//TODO: Proxy only supports fundermental operation
+
 var Model = require("./model.js");
 
 
 function readOnlyHandlerMaker(obj) {
   return {
-    findAll:       function(cb, connection) {
-      console.log("Succeed!" );
-      obj.findAll(cb, connection);
-    },
-    find:          function(condition, cb, connection) {
-      console.log("Succeed!" );
-      // obj.find(condition, cb, connection);
-    },
-    insert:       function() {
-      console.log("Failed: Unauthorized action!" );
-    },
-    delete:          function() {
-      console.log("Failed: Unauthorized action!" );
-    },
-    update:          function() {
-      console.log("Failed: Unauthorized action!" );
+    get : function(target, propKey, receiver){
+      if(propKey === 'tableName'){
+        console.log("Succeeded : Get table Name!" );
+        return obj.tableName;
+      }else if(propKey === 'findAll'){
+        console.log("Succeeded : Find All!" );
+        return obj.findAll;
+      }else if(propKey === 'find'){
+        console.log("Succeeded : Find by condition!" );
+        return obj.find;
+      }else if(propKey === 'insert' || propKey === 'delete' || propKey == 'update'){
+        console.log("Failed! No authorization!");
+        return function(){};
+      }else{
+        throw new Error('No such operation!');
+      }
     }
   };
 }
@@ -29,17 +30,6 @@ var proxyMaker = function(tableName){
   var model = new Model(tableName);
   var handler = readOnlyHandlerMaker(model);
   var proxy = new Proxy(model, handler);
-  // console.log(Object.getPrototypeOf(model));
-  // console.log(Object.getPrototypeOf(handler));
-  // console.log(Object.getPrototypeOf(proxy));
-  //
-  // console.log(model);
-  // console.log(handler);
-  // console.log(proxy);
-  //
-  // console.log(model.findAll);
-  // console.log(handler.findAll);
-  // console.log(proxy.findAll);
   return proxy;
 };
 
