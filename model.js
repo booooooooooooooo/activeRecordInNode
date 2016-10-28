@@ -100,24 +100,32 @@ Model.prototype.update = function(id, modify, cb, connection){
     else querySentence = querySentence + ',' + ' ' + key + ' ' + '=' + ' ?';
   }
   querySentence = querySentence + ' ' + 'where' + ' ' + 'id' + ' ' + '=' + '? ';
-  console.log("querySentence is \n");
-  console.log(querySentence);
+  // console.log("querySentence is \n");
+  // console.log(querySentence);
 
   var data = [];
   for(var key in modify){
     data.push(modify[key]);
   }
   data.push(id);
-  console.log("data is \n");
-  console.log(data);
+  // console.log("data is \n");
+  // console.log(data);
 
   connection.query( querySentence, data, function (err, result) {
     if (err) throw err;
     cb(result);
   });
 }
-
-
+//
+// /**
+//  *  Get scheme information of table.
+//  */
+// Model.prototype.getScheme = function(cb, connection){
+//   connection.query( "DESCRIBE " + this.tableName, function(err, rows, fields){
+//     if (err) throw err;
+//     cb(rows);
+//   } );
+// };
 
 
 
