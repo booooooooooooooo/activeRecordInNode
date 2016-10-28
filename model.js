@@ -1,16 +1,14 @@
 /**
  *  Constructor
  */
-function Record(tableName, association) {
+function Model(tableName) {
   this.tableName = tableName;
-  this.belongs_to = association['belongs_to'];
-  this.has_many = association['has_many'];
 }
 
 /**
  * Get the whole table. For test purpose.
  */
-Record.prototype.findAll = function(cb, connection) {
+Model.prototype.findAll = function(cb, connection) {
   connection.query('SELECT * from ' + this.tableName , function(err, rows, fields) {
     if (err)  throw err;
     cb(rows);
@@ -18,10 +16,10 @@ Record.prototype.findAll = function(cb, connection) {
 };
 
 /**
- * Find records that satisfy conditin.
+ * Find Models that satisfy conditin.
  * @condition = {propertyName : value, propertyName : value,...}
  */
-Record.prototype.find = function(condition, cb, connection) {
+Model.prototype.find = function(condition, cb, connection) {
   var querySentence = 'SELECT * from '  + this.tableName  + ' where ';
   var count = 0;
   for(var key in condition){
@@ -42,10 +40,11 @@ Record.prototype.find = function(condition, cb, connection) {
 };
 
 /**
- * Insert a new record to database.
+ * Insert a new Model to database.
  * @data = [{}, {}, {},...]. Each {} contains all property except id.
  */
-Record.prototype.insert = function(data, cb, connection){
+Model.prototype.insert = function(data, cb, connection){
+  //TODO: data is only {}
   var len = data.length;
   for (var i = 0; i < len; i++) {
       //TODO: replace id with serial number.
@@ -60,10 +59,11 @@ Record.prototype.insert = function(data, cb, connection){
 
 
 /**
- *  Delete records with given properties.
+ *  Delete Models with given properties.
  *  @data = [{}, {}, {},...].
  */
-Record.prototype.delete = function(data, cb, connection){
+Model.prototype.delete = function(data, cb, connection){
+  //TODO: data is only {}, and change name to condition
   var len = data.length;
   for (var i = 0; i < len; i++) {
     querySentence = ' DELETE  FROM ' + this.tableName + ' WHERE ' ;
@@ -83,12 +83,12 @@ Record.prototype.delete = function(data, cb, connection){
 };
 
 /**
- *  Update target record.
- *  @id is for locating record.
- *  @modify = {} which contains the data to be modified of located record.
+ *  Update target Model.
+ *  @id is for locating Model.
+ *  @modify = {} which contains the data to be modified of located Model.
  */
-Record.prototype.update = function(id, modify, cb, connection){
-  //TODO: locate and modify records.
+Model.prototype.update = function(id, modify, cb, connection){
+  //TODO: change id to condition
   var querySentence = '';
   querySentence = querySentence + ' UPDATE ' + this.tableName + ' SET ' ;
   var count = 0;
@@ -118,15 +118,7 @@ Record.prototype.update = function(id, modify, cb, connection){
 }
 
 
-/**
- *  Get scheme information of table.
- */
-Record.prototype.getScheme = function(cb, connection){
-  connection.query( "DESCRIBE " + this.tableName, function(err, rows, fields){
-    if (err) throw err;
-    cb(rows);
-  } );
-};
 
 
-module.exports.Record = Record;
+
+module.exports = Model;

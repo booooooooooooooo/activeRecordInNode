@@ -2,6 +2,9 @@
  * Create new table in database.
  * property = {propertyName : type, propertyName : type,...}
  */
+
+//TODO: Add function to change scheme, such as constrains.
+
 var createTable = function(tableName, property, cb, connection){
   var sentence = 'CREATE TABLE' + ' ' + tableName + ' ';
   sentence = sentence + '(' + ' ';
@@ -27,5 +30,16 @@ var deleteTable = function(tableName, cb, connection){
 
 }
 
-module.exports.createTable = createTable;  
+/**
+ *  Get scheme information of table.
+ */
+Model.prototype.getScheme = function(cb, connection){
+  connection.query( "DESCRIBE " + this.tableName, function(err, rows, fields){
+    if (err) throw err;
+    cb(rows);
+  } );
+};
+
+
+module.exports.createTable = createTable;
 module.exports.deleteTable = deleteTable;
