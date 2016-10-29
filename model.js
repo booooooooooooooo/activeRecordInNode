@@ -5,20 +5,20 @@ var closureModel = function(){
   function Model(tableName) {
     this.tableName = tableName;
   }
- 
+
   /**
    * Get the whole table. For test purpose.
    */
   Model.prototype.findAll = function(cb, connection) {
-    connection.query('SELECT * from ' + this.tableName , function(err, rows, fields) {
+    connection.query('SELECT * from ' + this.tableName , function(err, res) {
       if (err)  throw err;
-      cb(rows);
+      cb(res);
     });
   };
 
   /**
    * Find Models that satisfy conditin.
-   * @condition = {propertyName : value, propertyName : value,...}
+   * @condition = {propKey1 : value1, propKey2 : value2, ...}
    */
   Model.prototype.find = function(condition, cb, connection) {
     var querySentence = 'SELECT * from '  + this.tableName  + ' where ';
@@ -33,52 +33,51 @@ var closureModel = function(){
           querySentence = querySentence + ' and ' +' ' + key + ' ' + '=' + ' ' + '\'' + condition[key] + '\'' +' ';
         }
     }
-    //TODO: join table
-    connection.query(querySentence, function(err, rows, fields) {
+    connection.query(querySentence, function(err, res, fields) {
       if (err) throw err;
-      cb(rows);
+      cb(res);
     });
   };
 
   /**
    * Insert a new Model to database.
-   * @data = [{}, {}, {},...]. Each {} contains all property except id.
+   * @data = {propKey1 : value1, propKey2 : value2, ...}.
+   * Exept primary key, which is an unique ID automately generated, each propKey must be indicated in json.
    */
-  Model.prototype.insert = function(data, cb, connection){
-    //TODO: data is only {}
-    var len = data.length;
-    for (var i = 0; i < len; i++) {
-        //TODO: replace id with serial number.
-        var id = 0;
-        data[i]['id'] = 0;
-        connection.query('INSERT INTO ' + this.tableName + ' SET ?', data[i], function(err,res){
-          if(err) throw err;
-          cb(res);
-        });
-    }
+  Model.prototype.insert = function(data, cb, connection){//TODO: !! How to synchronize multiple insertion?
+    var that = this;//TODO: ?? How to systematically solve such scope problem?
+    var cb1 = function(largestID){
+      data['id'] =  largestID + 1;
+      connection.query('INSERT INTO ' + that.tableName + ' SET ?', data, function(err,res){
+        if(err) throw err;
+        cb(res);
+      });
+    };
+    this.getLagestID(cb1, connection);
+
   };
 
 
   /**
-   *  Delete Models with given properties.
-   *  @data = [{}, {}, {},...].
+   *  Delete items with given properties.
+   *  @condition = {propKey1 : value1, propKey2 : value2, ...}
    */
-  Model.prototype.delete = function(data, cb, connection){
-    //TODO: data is only {}, and change name to condition
-    var len = data.length;
+  Model.prototype.delete = function(condition, cb, connection){
+    //TODO: condition is only {}, and change name to condition
+    var len = condition.length;
     for (var i = 0; i < len; i++) {
       querySentence = ' DELETE  FROM ' + this.tableName + ' WHERE ' ;
       var count = 0;
-      for(var key in data[i]){
+      for(var key in condition[i]){
           if(count === 0){
-            querySentence = querySentence + ' ' + key + ' ' + '=' + ' ' + '\''+  data[i][key] + '\'' + ' ';
+            querySentence = querySentence + ' ' + key + ' ' + '=' + ' ' + '\''+  condition[i][key] + '\'' + ' ';
             count = 1;
           }
-          else querySentence = querySentence + ' ' + 'and' + ' ' + key + ' ' + '=' + ' '+ '\'' +  data[i][key] + '\''+ ' ';
+          else querySentence = querySentence + ' ' + 'and' + ' ' + key + ' ' + '=' + ' '+ '\'' +  condition[i][key] + '\''+ ' ';
       }
-      connection.query( querySentence, function (err, result) {
+      connection.query( querySentence, function (err, res) {
         if (err) throw err;
-        cb(result);
+        cb(res);
       });
     }
   };
@@ -86,10 +85,10 @@ var closureModel = function(){
   /**
    *  Update target Model.
    *  @id is for locating Model.
-   *  @modify = {} which contains the data to be modified of located Model.
+   *  @modify = {propKey1 : value1, propKey2 : value2, ...}
    */
   Model.prototype.update = function(id, modify, cb, connection){
-    //TODO: change id to condition
+    //TODO: change id to condition??
     var querySentence = '';
     querySentence = querySentence + ' UPDATE ' + this.tableName + ' SET ' ;
     var count = 0;
@@ -101,20 +100,17 @@ var closureModel = function(){
       else querySentence = querySentence + ',' + ' ' + key + ' ' + '=' + ' ?';
     }
     querySentence = querySentence + ' ' + 'where' + ' ' + 'id' + ' ' + '=' + '? ';
-    // console.log("querySentence is \n");
-    // console.log(querySentence);
+
 
     var data = [];
     for(var key in modify){
       data.push(modify[key]);
     }
     data.push(id);
-    // console.log("data is \n");
-    // console.log(data);
 
-    connection.query( querySentence, data, function (err, result) {
+    connection.query( querySentence, data, function (err, res) {
       if (err) throw err;
-      cb(result);
+      cb(res);
     });
   }
 
@@ -122,14 +118,24 @@ var closureModel = function(){
    *  Get scheme information of table.
    */
   Model.prototype.getScheme = function(cb, connection){
-    connection.query( "DESCRIBE " + this.tableName, function(err, rows, fields){
+    connection.query( "DESCRIBE " + this.tableName, function(err, res){
       if (err) throw err;
-      cb(rows);
+      cb(res);
     } );
   };
 
+  Model.prototype.getLagestID = function(cb, connection){
+    connection.query("select id from " + this.tableName + " order by id desc limit 1", function(err, res){
+      if(res.length == 0) cb(-1);
+      else cb(res[0].id);
+    } );
+
+  }
+
   return Model;
 }();
+
+
 
 
 
